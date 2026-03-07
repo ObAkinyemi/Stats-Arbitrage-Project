@@ -1,0 +1,10 @@
+https://www.statsmodels.org/dev/examples/notebooks/generated/ols.html
+https://www.statsmodels.org/stable/generated/statsmodels.tsa.stattools.adfuller.html
+https://www.statology.org/dickey-fuller-test-python/
+https://www.geeksforgeeks.org/pandas/python-pandas-series/
+https://www.geeksforgeeks.org/python/python-program-right-rotate-list-n/
+https://www.geeksforgeeks.org/python/how-to-remove-specific-elements-from-a-numpy-array/
+https://www.geeksforgeeks.org/data-science/ordinary-least-squares-ols-using-statsmodels/?limit=10
+https://www.geeksforgeeks.org/python/writing-csv-files-in-python/
+https://www.statsmodels.org/stable/_modules/statsmodels/tsa/stattools.html#adfuller
+https://www.statsmodels.org/dev/generated/statsmodels.regression.linear_model.OLSResults.resid.html
