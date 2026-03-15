@@ -8,3 +8,21 @@ https://www.geeksforgeeks.org/data-science/ordinary-least-squares-ols-using-stat
 https://www.geeksforgeeks.org/python/writing-csv-files-in-python/
 https://www.statsmodels.org/stable/_modules/statsmodels/tsa/stattools.html#adfuller
 https://www.statsmodels.org/dev/generated/statsmodels.regression.linear_model.OLSResults.resid.html
+https://pandas.pydata.org/docs/reference/api/pandas.Timestamp.html
+https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.columns.html
+
+Using a set to make sure there are no duplicate indices (timestamps) in checkpoint 1*;
+    https://www.w3schools.com/python/python_sets.asp
+    https://www.geeksforgeeks.org/python/python-convert-set-into-a-list/
+    https://www.geeksforgeeks.org/python/how-to-add-leading-zeros-to-a-number-in-python/
+    
+    Also used to convert the timestamp to just a date:
+        https://pandas.pydata.org/docs/reference/api/pandas.Timestamp.html
+
+How to use pandas.drop() properly (look at both otherwise drop won't work properly):
+    Documentation leaves out "inplace = True/False", which makes drop not work properly:
+        https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.drop.html#pandas.DataFrame.drop
+    Where inplace = true/false comes from:
+        https://www.geeksforgeeks.org/pandas/python-delete-rows-columns-from-dataframe-using-pandas-drop/
+
+For each coding session, I need to block out 2-3 hours, so I can properly debug stuff, otherwise, I won't be able to get anything done at all.
