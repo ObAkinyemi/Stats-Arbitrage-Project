@@ -8,7 +8,7 @@ import csv
 
 
 tickerList = [
-              ['ES=F', 'NQ=F', 'RTY=F', 'EMD=F', 'NKD=F', 'YM=F'],
+              ['ES=F', 'NQ=F', 'RTY=F', 'NKD=F', 'YM=F'],
               ['ZT=F', 'ZF=F', 'ZN=F', 'ZB=F', 'TN=F', 'ZQ=F'],
               ['CL=F', 'NG=F', 'BZ=F', 'HO=F', 'RB=F'],
               ['GC=F', 'HG=F', 'SI=F', 'PL=F', 'PA=F', 'ALI=F'],
@@ -28,27 +28,90 @@ def getCloseData(tickerListArr):
 # closeDataArr is the close data informatoin
 def masterListCreation(closeDataArr, tickerRow):
     
-    # CheckPoint 1: filter the data by dates
-    filteredCloseData = []
-    for i in range(0, len(tickerRow)):
-        for j in range(i+1,len(tickerRow)-1):
-        
-            
-            # Checkpoint 1 The calendar match (do the dates match)?
-            dateI = closeDataArr[tickerRow[i]].keys()
-            dateJ = closeDataArr[tickerRow[j]].keys()
-        
-            # could I just do this for checkpoint 1???
-            mask = dateI == dateJ
-            filteredCloseDataI = closeDataArr[tickerRow[i]][mask]
-            filteredCloseData.append(filteredCloseDataI)
-    # print(filteredCloseData)
-    # Checkpoint 2: filter the data by Nan
-    # the syntax is wrong, because I'm not allowed to do this with numpy arrays.
-    nanMask = ~np.isnan(filteredCloseData)
-    noNanData = filteredCloseData[nanMask]
-    print(noNanData)
+    # CheckPoint 1: filter the data by dates *now unecessary*
     
+    # Checking to see where the ticker values, dates, and tickers are
+    # print("------------------------------DateTimeIndices------------------------------")
+    # print(closeDataArr.index)
+    # print("------------------------------Columns------------------------------")
+    # print(closeDataArr.columns)
+    # print("------------------------------Values------------------------------")
+    # print(closeDataArr.values)
+    myDataIndices = np.array(closeDataArr.index)
+    myDataColumns = np.array(closeDataArr.columns)
+    myDataVals = np.array(closeDataArr.values)
+    
+    myData = pd.DataFrame(data = myDataVals, index = myDataIndices, columns = myDataColumns)
+    
+    # Checking for consistency between my dataframe and the yf dataframe
+    # print("------------------------------YF Data------------------------------")
+    # print(closeDataArr)
+    print("------------------------------My Data before nan drop------------------------------")
+    print(myData)
+    
+    # print("------------------------------YF Data------------------------------")
+    # print(closeDataArr.info(verbose=True))
+    # print("------------------------------My Data B4 nan drop------------------------------")
+    # print(myData.info(verbose=True))
+    sns = myData[closeDataArr.columns[3]]
+    # i = 0
+    # for val in sns:
+    #     # print(f"{sns.index[327]} | {i} | {val}")
+    #     i += 1
+    print("nan line")
+    print("\n")
+    # print(type(sns.index[327]))
+    print(sns.index[327])
+    print("\n")
+    # print(myData)
+    
+    
+    # Checkpoint 1*: filter the data by Nan
+    # syntax no longer wrong.
+    nanMask = set()
+    
+    for ticker in tickerRow:
+        nanIndex = 0
+        for value in myData[ticker]:
+            if (np.isnan(value) and len(nanMask) == 0):
+                rowToDrop = myData[ticker].index[nanIndex]
+                nanMask.add(rowToDrop)
+                        
+            nanIndex += 1
+    
+    # print(myData[nanMask])
+    nanMaskList = [*nanMask]
+    # print(nanMaskList[0].date())
+    
+    # I'm almost done with checkpoint 1. I just need to figure out how to properly put in the keys for the removal of the dates that have a nan row. I'm currently getting a key error. 
+    print("\n")
+    for data in nanMaskList:
+        dataYear = "{:02d}".format(data.date().year)
+        dataMonth = "{:02d}".format(data.date().month)
+        dataDay = "{:02d}".format(data.date().day)
+        stringifiedDate = f"{dataYear}-{dataMonth}-{dataDay}"
+        
+        print(stringifiedDate)
+        print("before nan removal")
+        print(myData[stringifiedDate])
+        myData.drop(stringifiedDate)
+        
+        print("\n")
+        print("after")
+        print(myData[stringifiedDate])
+        
+        
+    
+    
+        
+    
+    print("\n")
+    print("------------------------------My Data after nan drop------------------------------")
+    # print(myData.info(verbose=True))
+    # print(myData)
+    # print(myData[nanMaskList[0].date()])
+
+
     # Checkpoint 3: filter the data by number of data points
     # lenMaskIndices
     # for index in range(0, noNanData):
@@ -128,11 +191,10 @@ def writeToFile(outputFile, masterListArr):
 
 
 
-allCloseData = getCloseData(zipperTest)
+# allCloseData = getCloseData(zipperTest)
 # print(allCloseData)
 # print(type(allCloseData['ZC=F']))
-masterListCreation(allCloseData, zipperTest)
-
+masterListCreation(getCloseData(tickerList[3]), tickerList[3])
 
 # for sector in tickerList:
 #     allCloseData = getCloseData(sector)
