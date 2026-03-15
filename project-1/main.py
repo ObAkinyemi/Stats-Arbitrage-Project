@@ -46,13 +46,15 @@ def masterListCreation(closeDataArr, tickerRow):
     # Checking for consistency between my dataframe and the yf dataframe
     # print("------------------------------YF Data------------------------------")
     # print(closeDataArr)
-    print("------------------------------My Data before nan drop------------------------------")
-    print(myData)
+    # print("------------------------------My Data before nan drop------------------------------")
+    # print(myData)
     
     # print("------------------------------YF Data------------------------------")
     # print(closeDataArr.info(verbose=True))
     # print("------------------------------My Data B4 nan drop------------------------------")
     # print(myData.info(verbose=True))
+    
+# Testing to see whether the nan filter works (below)
     # sns = myData[closeDataArr.columns[3]]
     # i = 0
     # for val in sns:
@@ -64,10 +66,10 @@ def masterListCreation(closeDataArr, tickerRow):
     # print(sns.index[327])
     # print("\n")
     # print(myData)
+# Testing to see whether the nan filter works (above)
     
     
     # Checkpoint 1*: filter the data by Nan
-    # syntax no longer wrong.
     nanMask = set()
     
     for ticker in tickerRow:
@@ -90,33 +92,40 @@ def masterListCreation(closeDataArr, tickerRow):
         dataMonth = "{:02d}".format(data.date().month)
         dataDay = "{:02d}".format(data.date().day)
         stringifiedDate = f"{dataYear}-{dataMonth}-{dataDay}"
+    
+    # print the data before nan removal
+        # print(stringifiedDate)
+        # print("before nan removal")
+        # print(myData)
         
-        print(stringifiedDate)
-        print("before nan removal")
-        print(myData)
         myData.drop([stringifiedDate], inplace = True)
         
-        print("\n")
-        print("after")
-        print(myData)
+    # print the data after nan removal
+        # print("\n")
+        # print("after")
+        # print(myData)
         
     
-    print("\n")
-    print("------------------------------My Data after nan drop------------------------------")
-    print(myData)
+# manually looking at the data to see whether the drop function actually worked (below)
+    # print("\n")
+    # print("------------------------------My Data after nan drop------------------------------")
+    # print(myData)
 
-    for ticker in tickerRow:
-        i = 0
-        for val in myData[ticker]:
-            print(f"{i} | {myData[ticker].index[i]} | {val}")
-            i += 1
-        print("\n")
-        print("------------------------------My Data Lines------------------------------")
-        print("\n")
+    # for ticker in tickerRow:
+    #     i = 0
+    #     for val in myData[ticker]:
+    #         print(f"{i} | {myData[ticker].index[i]} | {val}")
+    #         i += 1
+    #     print("\n")
+    #     print("------------------------------My Data Lines------------------------------")
+    #     print("\n")
+    
+    # print(myData.info(verbose=True)) #the most important line as it gives concise info
+# manually looking at the data to see whether the drop function actually worked (above)
         
 
-    print(myData.info(verbose=True))
     # Checkpoint 3: filter the data by number of data points
+    # you will drop the column that doesn't have enough data points!!!!
     # lenMaskIndices
     # for index in range(0, noNanData):
         # if len(data) < 200:
