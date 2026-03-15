@@ -53,16 +53,16 @@ def masterListCreation(closeDataArr, tickerRow):
     # print(closeDataArr.info(verbose=True))
     # print("------------------------------My Data B4 nan drop------------------------------")
     # print(myData.info(verbose=True))
-    sns = myData[closeDataArr.columns[3]]
+    # sns = myData[closeDataArr.columns[3]]
     # i = 0
     # for val in sns:
-    #     # print(f"{sns.index[327]} | {i} | {val}")
+    #     print(f"{sns.index[327]} | {i} | {val}")
     #     i += 1
-    print("nan line")
-    print("\n")
-    # print(type(sns.index[327]))
-    print(sns.index[327])
-    print("\n")
+    # print("nan line")
+    # print("\n")
+    # # print(type(sns.index[327]))
+    # print(sns.index[327])
+    # print("\n")
     # print(myData)
     
     
@@ -93,25 +93,29 @@ def masterListCreation(closeDataArr, tickerRow):
         
         print(stringifiedDate)
         print("before nan removal")
-        print(myData[stringifiedDate])
-        myData.drop(stringifiedDate)
+        print(myData)
+        myData.drop([stringifiedDate], inplace = True)
         
         print("\n")
         print("after")
-        print(myData[stringifiedDate])
-        
-        
-    
-    
+        print(myData)
         
     
     print("\n")
     print("------------------------------My Data after nan drop------------------------------")
-    # print(myData.info(verbose=True))
-    # print(myData)
-    # print(myData[nanMaskList[0].date()])
+    print(myData)
 
+    for ticker in tickerRow:
+        i = 0
+        for val in myData[ticker]:
+            print(f"{i} | {myData[ticker].index[i]} | {val}")
+            i += 1
+        print("\n")
+        print("------------------------------My Data Lines------------------------------")
+        print("\n")
+        
 
+    print(myData.info(verbose=True))
     # Checkpoint 3: filter the data by number of data points
     # lenMaskIndices
     # for index in range(0, noNanData):
