@@ -28,6 +28,8 @@ def getCloseData(tickerListArr):
 # closeDataArr is the close data informatoin
 def masterListCreation(closeDataArr, tickerRow):
     
+    
+    
     # CheckPoint 1: filter the data by dates *now unecessary*
     
     # Checking to see where the ticker values, dates, and tickers are
@@ -42,6 +44,10 @@ def masterListCreation(closeDataArr, tickerRow):
     myDataVals = np.array(closeDataArr.values)
     
     myData = pd.DataFrame(data = myDataVals, index = myDataIndices, columns = myDataColumns)
+    
+    # testing whether checkpoint 2 works.
+    # print("------------------------------My Data before length drop------------------------------")
+    # print(myData.info(verbose=True))
     
     # Checking for consistency between my dataframe and the yf dataframe
     # print("------------------------------YF Data------------------------------")
@@ -70,8 +76,11 @@ def masterListCreation(closeDataArr, tickerRow):
     
     
     # Checkpoint 1*: filter the data by Nan
+    # This is to make sure I don't feed the math thingy nan data and
+    # then it breaks because it got something it can't use (like nan).
     nanMask = set()
     
+    # getting the index of the nan data within the columns of the various tickers.
     for ticker in tickerRow:
         nanIndex = 0
         for value in myData[ticker]:
@@ -85,7 +94,8 @@ def masterListCreation(closeDataArr, tickerRow):
     nanMaskList = [*nanMask]
     # print(nanMaskList[0].date())
     
-    # I'm almost done with checkpoint 1. I just need to figure out how to properly put in the keys for the removal of the dates that have a nan row. I'm currently getting a key error. 
+    # extracting date information from the nanIndex obtained in the above for loop
+    # and turning it into a string to input as a key into the data frame.
     print("\n")
     for data in nanMaskList:
         dataYear = "{:02d}".format(data.date().year)
@@ -124,75 +134,77 @@ def masterListCreation(closeDataArr, tickerRow):
 # manually looking at the data to see whether the drop function actually worked (above)
         
 
-    # Checkpoint 3: filter the data by number of data points
+    # Checkpoint 2*: filter the data by number of data points
     # you will drop the column that doesn't have enough data points!!!!
     # lenMaskIndices
-    # for index in range(0, noNanData):
-        # if len(data) < 200:
-            # lenMaskIndicies.append(index)
-            
-    # lengthMask = len(noNanData[lenMaskIndices]) > 200
-    # fullyFilteredData = noNanData[lengthMask]
+    for ticker in tickerRow:
+        if len(myData[ticker]) < 300:
+            myData.drop(columns=[ticker])
+     
+# Testing whether checkpiont 2 works       
+    # print("------------------------------My Data post length drop------------------------------")
+    # print(myData.info(verbose=True))
+    
    
-    # master_list = []
+    master_list = []
 
-    # for i in range(i, len(tickerRow)):
-    #     for j in range(i+1,len(tickerRow)-1):
+    for i in range(0, len(tickerRow)):
+        for j in range(i+1,len(tickerRow)-1):
             
 
     #     # smol list
-    #         ivj = []
-    #         ivj.append(tickerRow[i])
-    #         ivj.append(tickerRow[j])
+            ivj = []
+            ivj.append(tickerRow[i])
+            ivj.append(tickerRow[j])
             
             
     #     # hedge ratio
-    #         x = np.log(closeDataArr[tickerRow[i]].tolist())
-    #         y = np.log(closeDataArr[tickerRow[j]].tolist())
-    #         x = sm.add_constant(x)
-    #         result = sm.OLS(y, x).fit()
-    #         hedge_ratio = result.params[1]
-    #         ivj.append(hedge_ratio)
+            x = np.log(closeDataArr[tickerRow[i]].tolist())
+            y = np.log(closeDataArr[tickerRow[j]].tolist())
+            x = sm.add_constant(x)
+            result = sm.OLS(y, x).fit()
+            hedge_ratio = result.params[1]
+            ivj.append(hedge_ratio)
         
     #     # residuals
-    #         residuals = result.resid
+            residuals = result.resid
             
     #     # p-value
-    #         ADF_test = adfuller(residuals)
-    #         p_val = ADF_test[1]
+            ADF_test = adfuller(residuals)
+            p_val = ADF_test[1]
             
     #     # conditional logic
-    #         if p_val < 0.05:
+            if p_val < 0.05:
             
     #         # do all this
             
-    #             ivj.append(p_val)
+                ivj.append(p_val)
             
     #         # calculating half life
             
-    #             # delta_y = todays spread - yesterdays spread
-    #             delta_y = np.diff(residuals)
+                # delta_y = todays spread - yesterdays spread
+                delta_y = np.diff(residuals)
 
     #             # yesterdays spread
-    #             past_spread = np.roll(residuals, 1)
-    #             mask = ~past_spread[0]
-    #             n_past_spread = past_spread[mask]
+                past_spread = np.roll(residuals, 1)
+                mask = ~past_spread[0]
+                n_past_spread = past_spread[mask]
                 
     #             # implementing OLS regression on residuals to get half life
-    #             hlx = n_past_spread
-    #             hly = delta_y
-    #             hlx = sm.add_constant(hlx)
-    #             hl_result = sm.OLS(hly, hlx).fit()
+                hlx = n_past_spread
+                hly = delta_y
+                hlx = sm.add_constant(hlx)
+                hl_result = sm.OLS(hly, hlx).fit()
                 
     #             # extract the slope of the half life
-    #             hl_slope = hl_result.params[1]
+                hl_slope = hl_result.params[1]
                 
     #             # extract the half life
-    #             hl = -(np.log(2))/hl_slope
-    #             ivj.append(hl)
-    #             master_list.append(ivj)
+                hl = -(np.log(2))/hl_slope
+                ivj.append(hl)
+                master_list.append(ivj)
                 
-    # return master_list
+    return master_list
 
 # write it to an output file
 def writeToFile(outputFile, masterListArr):
@@ -207,9 +219,11 @@ def writeToFile(outputFile, masterListArr):
 # allCloseData = getCloseData(zipperTest)
 # print(allCloseData)
 # print(type(allCloseData['ZC=F']))
-masterListCreation(getCloseData(tickerList[3]), tickerList[3])
+# masterListCreation(getCloseData(tickerList[3]), tickerList[3])
 
-# for sector in tickerList:
+for sector in tickerList:
+    masterListCreation(getCloseData(sector), sector)
+    print(masterListCreation(getCloseData(sector), sector))
 #     allCloseData = getCloseData(sector)
 #     masterData = masterListCreation(allCloseData, sector)
 #     writeToFile("project_1_Output.csv", masterData)
