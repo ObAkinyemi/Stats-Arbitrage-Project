@@ -133,6 +133,7 @@ def masterListCreation(closeDataArr, tickerRow):
     # print(myData.info(verbose=True)) #the most important line as it gives concise info
 # manually looking at the data to see whether the drop function actually worked (above)
         
+    print("-------------------------- Check Point 1 Passed --------------------------")
 
     # Checkpoint 2*: filter the data by number of data points
     # you will drop the column that doesn't have enough data points!!!!
@@ -145,6 +146,7 @@ def masterListCreation(closeDataArr, tickerRow):
     # print("------------------------------My Data post length drop------------------------------")
     # print(myData.info(verbose=True))
     
+    print("-------------------------- CheckPoint 2 Passed --------------------------")
    
     master_list = []
 
@@ -157,22 +159,26 @@ def masterListCreation(closeDataArr, tickerRow):
             ivj.append(tickerRow[i])
             ivj.append(tickerRow[j])
             
+            print("-------------------------- ivj appended --------------------------")
+            
             
     #     # hedge ratio
-            x = np.log(closeDataArr[tickerRow[i]].tolist())
-            y = np.log(closeDataArr[tickerRow[j]].tolist())
+            x = np.log(myData[tickerRow[i]].tolist())
+            y = np.log(myData[tickerRow[j]].tolist())
             x = sm.add_constant(x)
             result = sm.OLS(y, x).fit()
             hedge_ratio = result.params[1]
             ivj.append(hedge_ratio)
         
-    #     # residuals
+            print("-------------------------- hedge ratio appended --------------------------")
+    #     # residuals/spread
             residuals = result.resid
             
     #     # p-value
             ADF_test = adfuller(residuals)
             p_val = ADF_test[1]
             
+            print("-------------------------- adfuller test passed appended --------------------------")
     #     # conditional logic
             if p_val < 0.05:
             
@@ -180,15 +186,20 @@ def masterListCreation(closeDataArr, tickerRow):
             
                 ivj.append(p_val)
             
+                print("-------------------------- pval appended --------------------------")
     #         # calculating half life
             
                 # delta_y = todays spread - yesterdays spread
                 delta_y = np.diff(residuals)
+                print("-------------------------- delta y calculated --------------------------")
 
     #             # yesterdays spread
                 past_spread = np.roll(residuals, 1)
-                mask = ~past_spread[0]
+                mask = past_spread != past_spread[0]
                 n_past_spread = past_spread[mask]
+                print("-------------------------- past spread calculated --------------------------")
+                print(f"length of past spread arr: {len(n_past_spread)}")
+                print(f"length of delta y arr: {len(delta_y)}")
                 
     #             # implementing OLS regression on residuals to get half life
                 hlx = n_past_spread
@@ -216,17 +227,23 @@ def writeToFile(outputFile, masterListArr):
 
 
 
-# allCloseData = getCloseData(zipperTest)
+# allCloseData = getCloseData(tickerList[0])
 # print(allCloseData)
 # print(type(allCloseData['ZC=F']))
-# masterListCreation(getCloseData(tickerList[3]), tickerList[3])
+# masterListCreation(allCloseData, tickerList[0])
+
+outputFileName = "project_1_Output.csv"
+
+with open(outputFileName, 'w', newline='') as csvfile:
+    writer = csv.writer(csvfile)
+    writer.writerow(['Asset 1', 'Asset 2', 'Hedge_Ratio', 'P_Value', 'Half_Life'])
 
 for sector in tickerList:
     masterListCreation(getCloseData(sector), sector)
     print(masterListCreation(getCloseData(sector), sector))
-#     allCloseData = getCloseData(sector)
-#     masterData = masterListCreation(allCloseData, sector)
-#     writeToFile("project_1_Output.csv", masterData)
+    allCloseData = getCloseData(sector)
+    masterData = masterListCreation(allCloseData, sector)
+    writeToFile(outputFileName, masterData)
     
 
 
