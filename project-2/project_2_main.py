@@ -4,10 +4,52 @@ import statsmodels.api as sm
 from statsmodels.tsa.stattools import adfuller
 import matplotlib.pyplot as plt
 import numpy as np
-import csv
+import sys
 
+
+# first digit = the project number
+# 2nd digit corresponds to function
+# 2 = project 2
+# 1 = checkpoint 1
+EXIT_CODE_21 = 21 #checkpoint 1 failed
+EXIT_CODE_22 = 22 #checkpoint 2 failed
 csvFile = pd.read_csv('../project-1/project_1_Output.csv')
 
+def checkPointOne(closeData, ticker):
+    # create data frame for ticker
+    tickerIndices = np.array(closeData.index)
+    tickerColumns = np.array(closeData.columns)
+    tickerVals = np.array(closeData.values)
+    
+    tickerData = pd.DataFrame(data = tickerVals, index = tickerIndices, columns = tickerColumns)
+    
+    # check for nan values
+    nanMask = set()
+    nanIndex = 0
+    
+    for value in tickerData[ticker]:
+        if (np.isnan(value) and len(nanMask) == 0):
+            rowToDrop = tickerData[ticker].index[nanIndex]
+            nanMask.add(rowToDrop)
+            nanIndex += 1
+    
+    # turn the set into a list
+    nanMaskList = [*nanMask]
+    
+    # extracting date information from the nanIndex obtained in the above for loop
+    # and turning it into a string to input as a key into the data frame.
+    print("\n")
+    for data in nanMaskList:
+        dataYear = "{:02d}".format(data.date().year)
+        dataMonth = "{:02d}".format(data.date().month)
+        dataDay = "{:02d}".format(data.date().day)
+        stringifiedDate = f"{dataYear}-{dataMonth}-{dataDay}"
+        tickerData.drop([stringifiedDate], inplace = True)
+        
+    return tickerData
+    
+# def checkPointTwo(closeData1, closeData2):
+    
 
 def getCloseData(ticker):
     rawData = yf.download(tickers=ticker, period="2y", interval="1d", auto_adjust=True)
@@ -16,18 +58,24 @@ def getCloseData(ticker):
 
 def getSpread(asset_y, asset_x, hedge_ratio):
     
-    yCD = getCloseData(asset_y)
-    xCD = getCloseData(asset_x)
     hr = hedge_ratio
     
-    # print(yCD['ES=F'].iloc[0])
-    # checkpoint 1
+    yCD = checkPointOne(getCloseData(asset_y), asset_y)
+    xCD = checkPointOne(getCloseData(asset_x), asset_x)
+    
     # checkpoint 2
     # check the length of asset y and asset x
+    lenY = len(yCD)
+    lenX = len(xCD)
+    if(lenY == lenX):
+        print("Check point 2 passed")
+    else:
+        sys.exit(f"Checkpoint 2 of project 2 failed. Exit Code: {EXIT_CODE_22}")
+    
     len_close = len(yCD)-1 #temporary until check length is implemented
     
     spread = np.log(yCD[asset_y]) - (hr*np.log(xCD[asset_x]))
-    print(spread)
+    return spread
     
             
     
@@ -35,32 +83,49 @@ def getSMA(spread, half_life):
 
     # checkpoint 1
     # check if the half-life is greater than 2
-    # rounding function to round the half life up or down based on what it is.
+    if half_life < 2:
+        half_life == 2
     
-    hl = half_life
+    hl = round(half_life)
     len_spread = len(spread)
+    dfSpread = spread.to_frame()
 
-    sma_arr = np.array([], dtype= 'd')
+    print(type(dfSpread))
+    sma_arr = dfSpread.rolling(window = hl, min_periods = hl).mean()
     
-    for n in range(0, len_spread):
-        sum = 0
-        for i in range(n, n+hl):
-            sum += spread.iloc[0]
-            avg = sum/hl
-        
-        np.append(sma_arr, avg)
+    # print(len(sma_arr))
         
     return sma_arr
             
+def getSTD(spread, half_life):
+        # checkpoint 1
+    # check if the half-life is greater than 2
+    if half_life < 2:
+        half_life == 2
+    
+    hl = round(half_life)
+    dfSpread = spread.to_frame()
+
+    print(type(dfSpread))
+    std_arr = dfSpread.rolling(window = hl, min_periods = hl).std()
+    
+    # print(len(sma_arr))
+        
+    return std_arr
     
 # print(getCloseData('ES=F'))
 
 yTicker = csvFile['Asset y'][0]
 xTicker = csvFile['Asset x'][0]
 hedgeRatio = csvFile['Hedge_Ratio'][0]
-getSpread(yTicker, xTicker, hedgeRatio)
+halfLife = float(csvFile['Half_Life'][0])
 
-halfLife = csvFile['Half_Life'][0]
+spr = getSpread(yTicker, xTicker, hedgeRatio)
+print(spr)
+sma = getSMA(spr, halfLife)
+std = getSTD(spr, halfLife)
+print(sma)
+print(std)
 
 # simple moving average
 # period = half_life
