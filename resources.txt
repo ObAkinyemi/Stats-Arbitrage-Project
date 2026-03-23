@@ -26,3 +26,15 @@ How to use pandas.drop() properly (look at both otherwise drop won't work proper
         https://www.geeksforgeeks.org/pandas/python-delete-rows-columns-from-dataframe-using-pandas-drop/
 
 For each coding session, I need to block out 2-3 hours, so I can properly debug stuff, otherwise, I won't be able to get anything done at all.
+
+Reading csv's with csv reader
+    https://docs.python.org/3/library/csv.html#reader-objects
+
+using numpy arrays and appending
+    https://numpy.org/doc/stable/reference/generated/numpy.append.html#numpy-append
+
+pandas documentation on dataframes and dataframe usage
+    https://pandas.pydata.org/docs/reference/frame.html
+
+reading csv's using pandas (better by far. not going to use CSV reader nearly as much)
+    https://www.geeksforgeeks.org/pandas/reading-csv-files-in-python/
