@@ -38,3 +38,10 @@ pandas documentation on dataframes and dataframe usage
 
 reading csv's using pandas (better by far. not going to use CSV reader nearly as much)
     https://www.geeksforgeeks.org/pandas/reading-csv-files-in-python/
+
+
+https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.rolling.html#pandas.DataFrame.rolling
+https://www.geeksforgeeks.org/python/how-does-pandas-rolling-objects-work/
+https://www.geeksforgeeks.org/pandas/python-pandas-series-to_frame/
+https://www.geeksforgeeks.org/python/convert-string-to-double-in-python3/
+https://www.w3schools.com/python/ref_func_round.asp

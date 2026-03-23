@@ -87,7 +87,6 @@ def getSMA(spread, half_life):
         half_life == 2
     
     hl = round(half_life)
-    len_spread = len(spread)
     dfSpread = spread.to_frame()
 
     print(type(dfSpread))
@@ -98,7 +97,7 @@ def getSMA(spread, half_life):
     return sma_arr
             
 def getSTD(spread, half_life):
-        # checkpoint 1
+    # checkpoint 1
     # check if the half-life is greater than 2
     if half_life < 2:
         half_life == 2
@@ -109,12 +108,9 @@ def getSTD(spread, half_life):
     print(type(dfSpread))
     std_arr = dfSpread.rolling(window = hl, min_periods = hl).std()
     
-    # print(len(sma_arr))
         
     return std_arr
     
-# print(getCloseData('ES=F'))
-
 yTicker = csvFile['Asset y'][0]
 xTicker = csvFile['Asset x'][0]
 hedgeRatio = csvFile['Hedge_Ratio'][0]
