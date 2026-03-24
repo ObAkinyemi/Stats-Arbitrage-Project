@@ -4,6 +4,7 @@ import statsmodels.api as sm
 from statsmodels.tsa.stattools import adfuller
 import matplotlib.pyplot as plt
 import numpy as np
+import math
 import sys
 
 
@@ -48,8 +49,11 @@ def checkPointOne(closeData, ticker):
         
     return tickerData
     
-# def checkPointTwo(closeData1, closeData2):
-
+def checkPointTwo(len1, len2):
+    if(len1 == len2):
+        print("Check point 2 passed")
+    else:
+        sys.exit(f"Checkpoint 2 of project 2 failed. Exit Code: {EXIT_CODE_22}")
 
 def getCloseData(ticker):
     rawData = yf.download(tickers=ticker, period="2y", interval="1d", auto_adjust=True)
@@ -67,10 +71,7 @@ def getSpread(asset_y, asset_x, hedge_ratio):
     # check the length of asset y and asset x
     lenY = len(yCD)
     lenX = len(xCD)
-    if(lenY == lenX):
-        print("Check point 2 passed")
-    else:
-        sys.exit(f"Checkpoint 2 of project 2 failed. Exit Code: {EXIT_CODE_22}")
+    checkPointTwo(lenY, lenX)
     
     spread = np.log(yCD[asset_y]) - (hr*np.log(xCD[asset_x]))
     # spread = spread.to_frame()
@@ -123,7 +124,7 @@ std = getSTD(spr, halfLife)
 # print(std)
 
 z_Score = (spr-sma)/std
-print(z_Score)
+# print(z_Score)
 
 state = 0
 
@@ -142,17 +143,31 @@ for i in range(len(z_Score)):
     # entry
     if val >= 2 and state == 0:
         # short asset y and buy asset x. I.e short the spread
-        print(f"{i} : {z_Score.index[i]} : {z_Score.values[i]}")
+        # print(f"{i} : {z_Score.index[i]} : {z_Score.values[i]}")
         state = -1
         # positions.iloc[i] = 1 or something
     elif val <= -2 and state == 0:
         # short asset x and buy asset y. I.e. buy the spread
-        print(f"{i} : {z_Score.index[i]} : {z_Score.values[i]}")
+        # print(f"{i} : {z_Score.index[i]} : {z_Score.values[i]}")
         state = 1
     
     position.iloc[i] = state
         
-print(position)
+
+spread_change = spr.diff()
+spread_change.dropna(inplace=True)
+new_position = position.shift(1)
+
+payoff = spread_change*new_position
+total_profit = payoff.sum()
+print(f"total profit: {total_profit}")
+
+# Sharpe Ratio: (Mean of Daily Returns (meanDR)/ Standard Deviation of Daily Returns (stdevDR)) * math.sqrt(252)
+meanDR = payoff.mean()
+stdevDR = payoff.std()
+Sharpe_Ratio = (meanDR/stdevDR)*math.sqrt(252)
+print(f"Sharpe Ratio: {Sharpe_Ratio}")
+# Max Drawdown: a little more complex
 
 # simple moving average
 # period = half_life

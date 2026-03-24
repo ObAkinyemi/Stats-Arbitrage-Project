@@ -19,121 +19,32 @@ zipperTest = ['ZC=F','ZF=F','RTY=F','PL=F']
 
 # get the close data needed
 def getCloseData(tickerListArr):
-    rawData = yf.download(tickers=tickerListArr, period="2y", interval="1d", auto_adjust=True)
+    rawData = yf.download(tickers=tickerListArr, period="5y", interval="1d", auto_adjust=True)
     closeData = rawData['Close']
     return closeData
 
 # create the 2D arr of the data necessary
 # tickerRow is the row of tickers for this asset class
 # closeDataArr is the close data informatoin
-def masterListCreation(closeDataArr, tickerRow):
+def ivjListCreation(closeDataArr, tickerRow):
     
     
     
     # CheckPoint 1: filter the data by dates *now unecessary*
-    
-    # Checking to see where the ticker values, dates, and tickers are
-    # print("------------------------------DateTimeIndices------------------------------")
-    # print(closeDataArr.index)
-    # print("------------------------------Columns------------------------------")
-    # print(closeDataArr.columns)
-    # print("------------------------------Values------------------------------")
-    # print(closeDataArr.values)
     myDataIndices = np.array(closeDataArr.index)
     myDataColumns = np.array(closeDataArr.columns)
     myDataVals = np.array(closeDataArr.values)
     
     myData = pd.DataFrame(data = myDataVals, index = myDataIndices, columns = myDataColumns)
-    
-    # testing whether checkpoint 2 works.
-    # print("------------------------------My Data before length drop------------------------------")
-    # print(myData.info(verbose=True))
-    
-    # Checking for consistency between my dataframe and the yf dataframe
-    # print("------------------------------YF Data------------------------------")
-    # print(closeDataArr)
-    # print("------------------------------My Data before nan drop------------------------------")
-    # print(myData)
-    
-    # print("------------------------------YF Data------------------------------")
-    # print(closeDataArr.info(verbose=True))
-    # print("------------------------------My Data B4 nan drop------------------------------")
-    # print(myData.info(verbose=True))
-    
-# Testing to see whether the nan filter works (below)
-    # sns = myData[closeDataArr.columns[3]]
-    # i = 0
-    # for val in sns:
-    #     print(f"{sns.index[327]} | {i} | {val}")
-    #     i += 1
-    # print("nan line")
-    # print("\n")
-    # # print(type(sns.index[327]))
-    # print(sns.index[327])
-    # print("\n")
-    # print(myData)
-# Testing to see whether the nan filter works (above)
+
     
     
     # Checkpoint 1*: filter the data by Nan
     # This is to make sure I don't feed the math thingy nan data and
     # then it breaks because it got something it can't use (like nan).
-    nanMask = set()
-    
-    # getting the index of the nan data within the columns of the various tickers.
-    for ticker in tickerRow:
-        nanIndex = 0
-        for value in myData[ticker]:
-            if (np.isnan(value) and len(nanMask) == 0):
-                rowToDrop = myData[ticker].index[nanIndex]
-                nanMask.add(rowToDrop)
-                        
-            nanIndex += 1
-    
-    # print(myData[nanMask])
-    nanMaskList = [*nanMask]
-    # print(nanMaskList[0].date())
-    
-    # extracting date information from the nanIndex obtained in the above for loop
-    # and turning it into a string to input as a key into the data frame.
-    print("\n")
-    for data in nanMaskList:
-        dataYear = "{:02d}".format(data.date().year)
-        dataMonth = "{:02d}".format(data.date().month)
-        dataDay = "{:02d}".format(data.date().day)
-        stringifiedDate = f"{dataYear}-{dataMonth}-{dataDay}"
-    
-    # print the data before nan removal
-        # print(stringifiedDate)
-        # print("before nan removal")
-        # print(myData)
+    myData.dropna(inplace = True)
         
-        myData.drop([stringifiedDate], inplace = True)
-        
-    # print the data after nan removal
-        # print("\n")
-        # print("after")
-        # print(myData)
-        
-    
-# manually looking at the data to see whether the drop function actually worked (below)
-    # print("\n")
-    # print("------------------------------My Data after nan drop------------------------------")
-    # print(myData)
-
-    # for ticker in tickerRow:
-    #     i = 0
-    #     for val in myData[ticker]:
-    #         print(f"{i} | {myData[ticker].index[i]} | {val}")
-    #         i += 1
-    #     print("\n")
-    #     print("------------------------------My Data Lines------------------------------")
-    #     print("\n")
-    
-    # print(myData.info(verbose=True)) #the most important line as it gives concise info
-# manually looking at the data to see whether the drop function actually worked (above)
-        
-    print("-------------------------- Check Point 1 Passed --------------------------")
+    print(f"-------------------------- Check Point 1 Passed --------------------------")
 
     # Checkpoint 2*: filter the data by number of data points
     # you will drop the column that doesn't have enough data points!!!!
@@ -142,24 +53,20 @@ def masterListCreation(closeDataArr, tickerRow):
         if len(myData[ticker]) < 300:
             myData.drop(columns=[ticker])
      
-# Testing whether checkpiont 2 works       
-    # print("------------------------------My Data post length drop------------------------------")
-    # print(myData.info(verbose=True))
-    
-    print("-------------------------- CheckPoint 2 Passed --------------------------")
+    print(f"-------------------------- CheckPoint 2 Passed --------------------------")
    
-    master_list = []
+    masterList = []
 
     for i in range(0, len(tickerRow)):
         for j in range(i+1,len(tickerRow)-1):
             
-
+            print(f"-------------------------- {tickerRow[i]} vs {tickerRow[j]} --------------------------")
     #     # smol list
             ivj = []
+            
             ivj.append(tickerRow[i])
             ivj.append(tickerRow[j])
-            
-            print("-------------------------- ivj appended --------------------------")
+            print(f"-------------------------- ivj appended --------------------------")
             
             
     #     # hedge ratio
@@ -170,7 +77,7 @@ def masterListCreation(closeDataArr, tickerRow):
             hedge_ratio = result.params[1]
             ivj.append(hedge_ratio)
         
-            print("-------------------------- hedge ratio appended --------------------------")
+            print(f"-------------------------- hedge ratio appended --------------------------")
     #     # residuals/spread
             residuals = result.resid
             
@@ -178,7 +85,7 @@ def masterListCreation(closeDataArr, tickerRow):
             ADF_test = adfuller(residuals)
             p_val = ADF_test[1]
             
-            print("-------------------------- adfuller test passed appended --------------------------")
+            print(f"-------------------------- adfuller test passed appended --------------------------")
     #     # conditional logic
             if p_val < 0.05:
             
@@ -186,18 +93,18 @@ def masterListCreation(closeDataArr, tickerRow):
             
                 ivj.append(p_val)
             
-                print("-------------------------- pval appended --------------------------")
+                print(f"-------------------------- pval appended --------------------------")
     #         # calculating half life
             
                 # delta_y = todays spread - yesterdays spread
                 delta_y = np.diff(residuals)
-                print("-------------------------- delta y calculated --------------------------")
+                print(f"-------------------------- delta y calculated --------------------------")
 
     #             # yesterdays spread
                 past_spread = np.roll(residuals, 1)
                 mask = past_spread != past_spread[0]
                 n_past_spread = past_spread[mask]
-                print("-------------------------- past spread calculated --------------------------")
+                print(f"-------------------------- past spread calculated --------------------------")
                 print(f"length of past spread arr: {len(n_past_spread)}")
                 print(f"length of delta y arr: {len(delta_y)}")
                 
@@ -213,9 +120,10 @@ def masterListCreation(closeDataArr, tickerRow):
     #             # extract the half life
                 hl = -(np.log(2))/hl_slope
                 ivj.append(hl)
-                master_list.append(ivj)
+                masterList.append(ivj)
+        print("\n")
                 
-    return master_list
+    return masterList
 
 # write it to an output file
 def writeToFile(outputFile, masterListArr):
@@ -239,26 +147,15 @@ with open(outputFileName, 'w', newline='') as csvfile:
     writer.writerow(['Asset y', 'Asset x', 'Hedge_Ratio', 'P_Value', 'Half_Life'])
 
 for sector in tickerList:
-    masterListCreation(getCloseData(sector), sector)
-    print(masterListCreation(getCloseData(sector), sector))
+    # print(ivjListCreation(getCloseData(sector), sector))
+    print(f"-------------------------- {sector} --------------------------")
     allCloseData = getCloseData(sector)
-    masterData = masterListCreation(allCloseData, sector)
-    writeToFile(outputFileName, masterData)
+    ivjData = ivjListCreation(allCloseData, sector)
+    print(ivjData)
+
+    writeToFile(outputFileName, ivjData)
     
 
-
-
-# determine which 10 sectors to go in
-# determine which 5 futures of those sectors to go in
-# get the tickers
-# create the 10 lists of 5 futures
-# run all 3 functions on each of the 10 lists
-# just make a 2d list with all the futures.
-# for sector in market:
-    # run function 1
-    # run function 2
-    # run function 3
-    
 # visualize the data if wanted. This is for ES=F and YM=F
 # plt.scatter(np.log(closeData['ES=F']), np.log(closeData['YM=F']), color='blue', label='Data Points')
 

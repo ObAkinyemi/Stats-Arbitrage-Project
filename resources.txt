@@ -54,3 +54,11 @@ https://www.geeksforgeeks.org/python/python-pandas-dataframe-dropna/
 https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.std.html
 https://pandas.pydata.org/pandas-docs/stable/reference/series.html
 https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.dropna.html
+https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Series.iloc.html
+https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Series.drop.html
+https://pandas.pydata.org/pandas-docs/stable/user_guide/basics.html#basics-dtypes
+https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Series.diff.html#pandas.Series.diff
+https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Series.sum.html#pandas.Series.sum
+https://www.askpython.com/python-modules/pandas/inplace-true-parameter
+
+https://ranaroussi.github.io/yfinance/reference/api/yfinance.download.html
