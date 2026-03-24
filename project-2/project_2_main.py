@@ -49,7 +49,7 @@ def checkPointOne(closeData, ticker):
     return tickerData
     
 # def checkPointTwo(closeData1, closeData2):
-    
+
 
 def getCloseData(ticker):
     rawData = yf.download(tickers=ticker, period="2y", interval="1d", auto_adjust=True)
@@ -72,12 +72,9 @@ def getSpread(asset_y, asset_x, hedge_ratio):
     else:
         sys.exit(f"Checkpoint 2 of project 2 failed. Exit Code: {EXIT_CODE_22}")
     
-    len_close = len(yCD)-1 #temporary until check length is implemented
-    
     spread = np.log(yCD[asset_y]) - (hr*np.log(xCD[asset_x]))
+    # spread = spread.to_frame()
     return spread
-    
-            
     
 def getSMA(spread, half_life):
 
@@ -87,10 +84,8 @@ def getSMA(spread, half_life):
         half_life == 2
     
     hl = round(half_life)
-    dfSpread = spread.to_frame()
-
-    print(type(dfSpread))
-    sma_arr = dfSpread.rolling(window = hl, min_periods = hl).mean()
+    # print(type(spread))
+    sma_arr = spread.rolling(window = hl, min_periods = hl).mean()
     
     # print(len(sma_arr))
         
@@ -103,10 +98,9 @@ def getSTD(spread, half_life):
         half_life == 2
     
     hl = round(half_life)
-    dfSpread = spread.to_frame()
 
-    print(type(dfSpread))
-    std_arr = dfSpread.rolling(window = hl, min_periods = hl).std()
+    # print(type(spread))
+    std_arr = spread.rolling(window = hl, min_periods = hl).std()
     
         
     return std_arr
@@ -117,11 +111,31 @@ hedgeRatio = csvFile['Hedge_Ratio'][0]
 halfLife = float(csvFile['Half_Life'][0])
 
 spr = getSpread(yTicker, xTicker, hedgeRatio)
-print(spr)
 sma = getSMA(spr, halfLife)
 std = getSTD(spr, halfLife)
+print(f"type of spread: {type(spr)}")
+print(f"type of sma: {type(sma)}")
+print(f"type of stdev: {type(std)}")
+
+
+print(spr)
 print(sma)
 print(std)
+
+z_Score = (spr-sma)/std
+print(z_Score)
+
+
+buy_flag = False
+sell_flag = False
+open_position = False
+
+for i in range(0, len(z_Score)-1):
+    if z_Score.iloc[i] > 2:
+        print(f"{i} : {z_Score.index[i]} : {z_Score.values[i]}")
+    elif z_Score.iloc[i] < -2:
+        print(f"{i} : {z_Score.index[i]} : {z_Score.values[i]}")
+        
 
 # simple moving average
 # period = half_life
@@ -141,8 +155,6 @@ print(std)
 # Z-score = (spread (i.e. residuals) - rolling average)/rolling standard deviation
 
 
-# bool buy_flag = false
-# bool sell_flag = false
 # entry/exit
 
 # zscore trade for above 2.0 (sell)
