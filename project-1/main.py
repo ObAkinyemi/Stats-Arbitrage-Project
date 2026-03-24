@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import csv
 
-
+PERIOD = "5y"
 tickerList = [
               ['ES=F', 'NQ=F', 'RTY=F', 'NKD=F', 'YM=F'],
               ['ZT=F', 'ZF=F', 'ZN=F', 'ZB=F', 'TN=F', 'ZQ=F'],
@@ -50,7 +50,7 @@ def ivjListCreation(closeDataArr, tickerRow):
     # you will drop the column that doesn't have enough data points!!!!
     # lenMaskIndices
     for ticker in tickerRow:
-        if len(myData[ticker]) < 300:
+        if len(myData[ticker]) < 1500:
             myData.drop(columns=[ticker])
      
     print(f"-------------------------- CheckPoint 2 Passed --------------------------")
