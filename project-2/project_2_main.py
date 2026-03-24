@@ -113,29 +113,51 @@ halfLife = float(csvFile['Half_Life'][0])
 spr = getSpread(yTicker, xTicker, hedgeRatio)
 sma = getSMA(spr, halfLife)
 std = getSTD(spr, halfLife)
-print(f"type of spread: {type(spr)}")
-print(f"type of sma: {type(sma)}")
-print(f"type of stdev: {type(std)}")
 
+# print(f"type of spread: {type(spr)}")
+# print(f"type of sma: {type(sma)}")
+# print(f"type of stdev: {type(std)}")
 
-print(spr)
-print(sma)
-print(std)
+# print(spr)
+# print(sma)
+# print(std)
 
 z_Score = (spr-sma)/std
 print(z_Score)
 
+state = 0
 
-buy_flag = False
-sell_flag = False
-open_position = False
-
-for i in range(0, len(z_Score)-1):
+position = pd.Series(data = [0 for i in range(len(z_Score))], index = z_Score.index, dtype="int8")
+for i in range(len(z_Score)):
+    
+    val = z_Score.values[i]
+    # exit
+    if (z_Score.values[i] * z_Score.values[i-1] < 0) or (z_Score.values[i] == 0):
+        state = 0
+    
+    # entry
     if z_Score.iloc[i] > 2:
+        # short asset y and buy asset x. I.e short the spread
         print(f"{i} : {z_Score.index[i]} : {z_Score.values[i]}")
+        state = -1
+        # positions.iloc[i] = 1 or something
     elif z_Score.iloc[i] < -2:
+        # short asset x and buy asset y. I.e. buy the spread
         print(f"{i} : {z_Score.index[i]} : {z_Score.values[i]}")
+        state = 1
+    
+    # while I'm in the position
+    if state == -1 and z_Score.values[i] > 0:
+        # shorting the spread
+        position.iloc[i] = state
+    elif state == 1 and z_Score.values[i] < 0:
+        # buying the spread
+        position.iloc[i] = 1
+    else:
+        # out of the market
+        position.iloc[i] = 0
         
+print(position)
 
 # simple moving average
 # period = half_life

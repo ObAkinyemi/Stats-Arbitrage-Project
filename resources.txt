@@ -45,3 +45,12 @@ https://www.geeksforgeeks.org/python/how-does-pandas-rolling-objects-work/
 https://www.geeksforgeeks.org/pandas/python-pandas-series-to_frame/
 https://www.geeksforgeeks.org/python/convert-string-to-double-in-python3/
 https://www.w3schools.com/python/ref_func_round.asp
+
+https://www.geeksforgeeks.org/pandas/dataframe-vs-series-in-pandas/
+https://www.geeksforgeeks.org/pandas/drop-rows-from-the-dataframe-based-on-certain-condition-applied-on-a-column/
+https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#boolean-indexing
+https://stackoverflow.com/questions/45003557/pandas-boolean-indexing-error-with-drop
+https://www.geeksforgeeks.org/python/python-pandas-dataframe-dropna/
+https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.std.html
+https://pandas.pydata.org/pandas-docs/stable/reference/series.html
+https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.dropna.html
