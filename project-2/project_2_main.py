@@ -131,31 +131,26 @@ position = pd.Series(data = [0 for i in range(len(z_Score))], index = z_Score.in
 for i in range(len(z_Score)):
     
     val = z_Score.values[i]
+    
     # exit
-    if (z_Score.values[i] * z_Score.values[i-1] < 0) or (z_Score.values[i] == 0):
+    if state == -1 and val <= 0:
+        state = 0
+    
+    if state == 1 and val >= 0:
         state = 0
     
     # entry
-    if z_Score.iloc[i] > 2:
+    if val >= 2 and state == 0:
         # short asset y and buy asset x. I.e short the spread
         print(f"{i} : {z_Score.index[i]} : {z_Score.values[i]}")
         state = -1
         # positions.iloc[i] = 1 or something
-    elif z_Score.iloc[i] < -2:
+    elif val <= -2 and state == 0:
         # short asset x and buy asset y. I.e. buy the spread
         print(f"{i} : {z_Score.index[i]} : {z_Score.values[i]}")
         state = 1
     
-    # while I'm in the position
-    if state == -1 and z_Score.values[i] > 0:
-        # shorting the spread
-        position.iloc[i] = state
-    elif state == 1 and z_Score.values[i] < 0:
-        # buying the spread
-        position.iloc[i] = 1
-    else:
-        # out of the market
-        position.iloc[i] = 0
+    position.iloc[i] = state
         
 print(position)
 
