@@ -106,6 +106,9 @@ def getSTD(spread, half_life):
         
     return std_arr
     
+    
+# for loop to go through all the data points. Figure it out after doing the mark down ratio thingy.
+    
 yTicker = csvFile['Asset y'][0]
 xTicker = csvFile['Asset x'][0]
 hedgeRatio = csvFile['Hedge_Ratio'][0]
