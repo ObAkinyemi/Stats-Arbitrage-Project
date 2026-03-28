@@ -55,6 +55,34 @@ def checkPointTwo(len1, len2):
     else:
         sys.exit(f"Checkpoint 2 of project 2 failed. Exit Code: {EXIT_CODE_22}")
 
+def createEquityCurve(daily_profits):
+    
+    rollingProfits = pd.Series([])
+    i = 0
+    sum = 0
+    for takeProfit in daily_profits:
+        sum += takeProfit
+        rollingProfits += [sum]
+        rollingProfits.index[i] = daily_profits.index[i]
+        i += 1
+        
+    return rollingProfits
+        
+
+def create_drawdown(equity_curve):
+    hwm = [0]
+    eq_idx = equity_curve.index
+    drawdown = pd.Series(index = eq_idx, dtype=float)
+    duration = pd.Series(index = eq_idx, dtype=float)
+
+    # Loop over the index range
+    for t in range(1, len(eq_idx)):
+        cur_hwm = max(hwm[t-1], equity_curve[t])
+        hwm.append(cur_hwm)
+        drawdown[t]= hwm[t] - equity_curve[t]
+        duration[t]= 0 if drawdown[t] == 0 else duration[t-1] + 1
+    return drawdown.max(), duration.max()
+
 def getCloseData(ticker):
     rawData = yf.download(tickers=ticker, period="2y", interval="1d", auto_adjust=True)
     closeData = rawData['Close']
@@ -163,36 +191,24 @@ new_position = position.shift(1)
 
 payoff = spread_change*new_position
 total_profit = payoff.sum()
-print(f"total profit: {total_profit}")
+# print(f"total profit: {total_profit}")
 
 # Sharpe Ratio: (Mean of Daily Returns (meanDR)/ Standard Deviation of Daily Returns (stdevDR)) * math.sqrt(252)
 meanDR = payoff.mean()
 stdevDR = payoff.std()
 Sharpe_Ratio = (meanDR/stdevDR)*math.sqrt(252)
-print(f"Sharpe Ratio: {Sharpe_Ratio}")
+# print(f"Sharpe Ratio: {Sharpe_Ratio}")
+
+
 # Max Drawdown: a little more complex
 
-# simple moving average
-# period = half_life
-# get n price points and divide it over n for each period
-# spread_arr = []
-# spread = getCloseData(asset_x)[i] - (hedge_ratio*getcloseData(asset_y)[i])
-
-# checkpoint 1
-# checkpoint 2
-# for loop
-    # spread_arr.append(spread)
-    
+# equity curve
+print(payoff)
+eqCurve = createEquityCurve(payoff)
+# create_drawdown(eqCurve)
 
 
-# standard deviation
-
-# Z-score = (spread (i.e. residuals) - rolling average)/rolling standard deviation
-
-
-# entry/exit
-
-# zscore trade for above 2.0 (sell)
-# zscore trade for below 2.0 (buy)
+# high water mark
+# MDD
     
 # sharpe and drawdown
