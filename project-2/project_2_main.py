@@ -181,7 +181,7 @@ for row in csvFile.itertuples():
     spread_change = spr.diff()
     spread_change.dropna(inplace=True)
     new_position = position.shift(1)
-
+ 
     payoff = spread_change*new_position 
     total_profit = payoff.sum()
     # print(f"total profit: {total_profit}")
