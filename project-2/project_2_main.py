@@ -57,16 +57,7 @@ def checkPointTwo(len1, len2):
 
 def createEquityCurve(daily_profits):
     
-    rollingProfits = pd.Series([])
-    i = 0
-    sum = 0
-    for takeProfit in daily_profits:
-        sum += takeProfit
-        rollingProfits += [sum]
-        rollingProfits.index[i] = daily_profits.index[i]
-        i += 1
-        
-    return rollingProfits
+    return daily_profits.cumsum()
         
 
 def create_drawdown(equity_curve):
@@ -77,10 +68,10 @@ def create_drawdown(equity_curve):
 
     # Loop over the index range
     for t in range(1, len(eq_idx)):
-        cur_hwm = max(hwm[t-1], equity_curve[t])
+        cur_hwm = max(hwm[t-1], equity_curve.iloc[t])
         hwm.append(cur_hwm)
-        drawdown[t]= hwm[t] - equity_curve[t]
-        duration[t]= 0 if drawdown[t] == 0 else duration[t-1] + 1
+        drawdown.iloc[t]= hwm[t] - equity_curve.iloc[t]
+        duration.iloc[t]= 0 if drawdown.iloc[t] == 0 else duration.iloc[t-1] + 1
     return drawdown.max(), duration.max()
 
 def getCloseData(ticker):
@@ -135,80 +126,98 @@ def getSTD(spread, half_life):
     return std_arr
     
     
+project2Results = []
 # for loop to go through all the data points. Figure it out after doing the mark down ratio thingy.
     
-yTicker = csvFile['Asset y'][0]
-xTicker = csvFile['Asset x'][0]
-hedgeRatio = csvFile['Hedge_Ratio'][0]
-halfLife = float(csvFile['Half_Life'][0])
+for row in csvFile.itertuples():
+    yTicker = row.Asset_y
+    xTicker = row.Asset_x
+    hedgeRatio = row.Hedge_Ratio
+    halfLife = float(row.Half_Life)
 
-spr = getSpread(yTicker, xTicker, hedgeRatio)
-sma = getSMA(spr, halfLife)
-std = getSTD(spr, halfLife)
+    spr = getSpread(yTicker, xTicker, hedgeRatio)
+    sma = getSMA(spr, halfLife)
+    std = getSTD(spr, halfLife)
 
-# print(f"type of spread: {type(spr)}")
-# print(f"type of sma: {type(sma)}")
-# print(f"type of stdev: {type(std)}")
+    # print(f"type of spread: {type(spr)}")
+    # print(f"type of sma: {type(sma)}")
+    # print(f"type of stdev: {type(std)}")
 
-# print(spr)
-# print(sma)
-# print(std)
+    # print(spr)
+    # print(sma)
+    # print(std)
 
-z_Score = (spr-sma)/std
-# print(z_Score)
+    z_Score = (spr-sma)/std
+    print(z_Score)
 
-state = 0
+    state = 0
 
-position = pd.Series(data = [0 for i in range(len(z_Score))], index = z_Score.index, dtype="int8")
-for i in range(len(z_Score)):
-    
-    val = z_Score.values[i]
-    
-    # exit
-    if state == -1 and val <= 0:
-        state = 0
-    
-    if state == 1 and val >= 0:
-        state = 0
-    
-    # entry
-    if val >= 2 and state == 0:
-        # short asset y and buy asset x. I.e short the spread
-        # print(f"{i} : {z_Score.index[i]} : {z_Score.values[i]}")
-        state = -1
-        # positions.iloc[i] = 1 or something
-    elif val <= -2 and state == 0:
-        # short asset x and buy asset y. I.e. buy the spread
-        # print(f"{i} : {z_Score.index[i]} : {z_Score.values[i]}")
-        state = 1
-    
-    position.iloc[i] = state
+    position = pd.Series(data = [0 for i in range(len(z_Score))], index = z_Score.index, dtype="int8")
+    for i in range(len(z_Score)):
         
+        val = z_Score.values[i]
+        
+        # exit
+        if state == -1 and val <= 0:
+            state = 0
+        
+        if state == 1 and val >= 0:
+            state = 0
+        
+        # entry
+        if val >= 2 and state == 0:
+            # short asset y and buy asset x. I.e short the spread
+            # print(f"{i} : {z_Score.index[i]} : {z_Score.values[i]}")
+            state = -1
+            # positions.iloc[i] = 1 or something
+        elif val <= -2 and state == 0:
+            # short asset x and buy asset y. I.e. buy the spread
+            # print(f"{i} : {z_Score.index[i]} : {z_Score.values[i]}")
+            state = 1
+        
+        position.iloc[i] = state
+            
 
-spread_change = spr.diff()
-spread_change.dropna(inplace=True)
-new_position = position.shift(1)
+    spread_change = spr.diff()
+    spread_change.dropna(inplace=True)
+    new_position = position.shift(1)
 
-payoff = spread_change*new_position
-total_profit = payoff.sum()
-# print(f"total profit: {total_profit}")
+    payoff = spread_change*new_position
+    total_profit = payoff.sum()
+    # print(f"total profit: {total_profit}")
 
-# Sharpe Ratio: (Mean of Daily Returns (meanDR)/ Standard Deviation of Daily Returns (stdevDR)) * math.sqrt(252)
-meanDR = payoff.mean()
-stdevDR = payoff.std()
-Sharpe_Ratio = (meanDR/stdevDR)*math.sqrt(252)
-# print(f"Sharpe Ratio: {Sharpe_Ratio}")
-
-
-# Max Drawdown: a little more complex
-
-# equity curve
-print(payoff)
-eqCurve = createEquityCurve(payoff)
-# create_drawdown(eqCurve)
+    # Sharpe Ratio: (Mean of Daily Returns (meanDR)/ Standard Deviation of Daily Returns (stdevDR)) * math.sqrt(252)
+    meanDR = payoff.mean()
+    stdevDR = payoff.std()
+    Sharpe_Ratio = (meanDR/stdevDR)*math.sqrt(252)
+    # print(f"Sharpe Ratio: {Sharpe_Ratio}")
 
 
-# high water mark
-# MDD
+    # Max Drawdown: a little more complex
+
+    # equity curve
+    # print(payoff)
+    eqCurve = createEquityCurve(payoff)
+
+    # create_drawdown(eqCurve)
+    # high water mark
+    # MDD
+    max_dd, max_duration = create_drawdown(eqCurve)
+
+        
+    # drawdown
+    print(f"Max Drawdown: {max_dd}")
+
+    pair_stats = {
+        "Asset_y": yTicker,
+        "Asset_x": xTicker,
+        "Sharpe": Sharpe_Ratio,
+        "Max_Drawdown": max_dd
+    }
+    project2Results.append(pair_stats)
     
-# sharpe and drawdown
+print("results")
+# print(project2Results)
+project_2_DF = pd.DataFrame(data=project2Results)
+print(project_2_DF)
+project_2_DF.to_csv("project_2_Output.csv", index=False)

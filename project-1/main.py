@@ -144,7 +144,7 @@ outputFileName = "project_1_Output.csv"
 
 with open(outputFileName, 'w', newline='') as csvfile:
     writer = csv.writer(csvfile)
-    writer.writerow(['Asset y', 'Asset x', 'Hedge_Ratio', 'P_Value', 'Half_Life'])
+    writer.writerow(['Asset_y', 'Asset_x', 'Hedge_Ratio', 'P_Value', 'Half_Life'])
 
 for sector in tickerList:
     # print(ivjListCreation(getCloseData(sector), sector))
