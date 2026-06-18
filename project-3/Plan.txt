@@ -1,0 +1,9 @@
+1. grab hedge ratio from project 1.
+2. approx_ratio = yesterday's final ratio
+	
+3. look at live prices as they come in and calculate new hedge ratio periodically throughout the day
+4. calculate Kalman gain
+5. Use measurement variance, Kalman Gain. If noise is crazy for a second, then it's a spike, otherwise it's real movement.
+6. calculate the Greek equation you gave me before.
+7. plot old hedge ratio and Kalman hedge ratio on the same chart (what's the x-axis and the y-axis? I would imagine the x-axis is time and the y-axis is the points or price or whatever I was using to calculate it???)
+8. put it into a document for euro vs british pound futures?
