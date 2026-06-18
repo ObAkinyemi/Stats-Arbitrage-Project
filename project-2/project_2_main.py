@@ -92,7 +92,7 @@ def getSpread(asset_y, asset_x, hedge_ratio):
     lenX = len(xCD)
     checkPointTwo(lenY, lenX)
     
-    spread = yCD[asset_y]) - (hr*np.log(xCD[asset_x])
+    spread = np.log(yCD[asset_y]) - (hr*np.log(xCD[asset_x])
     # spread = spread.to_frame()
     return spread
     
